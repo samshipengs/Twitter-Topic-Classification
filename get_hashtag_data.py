@@ -18,8 +18,6 @@ if len(sys.argv) != 2:
 else:	
 	hashtag_topic = "#" + str(sys.argv[1])
 
-print "Getting data for: {} ...".format(hashtag_topic)
-
 consumer_key = "9ksfPRs86QKSOSjwSwQ2AvQfy"
 consumer_secret = "SuoUoM5S9ObKal0P2LxFxGR6JFw7uJy9IMgUBoby0jSJRMVEog"
 access_token = "824393536305065984-1svM8e32qFzjSMjb8dUQ6QLC8MYvNRJ"
@@ -34,16 +32,26 @@ api = tweepy.API(auth)
 from tweepy import Stream
 from tweepy.streaming import StreamListener
  
+MAX = 10000
 class MyListener(StreamListener):
- 
+    def __init__(self):
+        # super(MyListener, self).__init__()
+        self.num_tweets = 0
+
     def on_data(self, data):
         try:
-            fname = hashtag_topic + ".json"
-            with open(fname[1:], "a") as f:
-                f.write(data)
-                return True
+            self.num_tweets += 1
+            if self.num_tweets <= MAX:
+                fname = hashtag_topic + ".json"
+                with open('./data/' + fname[1:], "a") as f:
+                    f.write(data)
+                    return True
+            else:
+                print "Done collecting {} tweets about {}".format(MAX, hashtag_topic)
+                return False
+
         except BaseException as e:
-            print("&quot;Error on_data: %s&quot;" % str(e))
+            print("Error on_data: {}".format(str(e)))
         return True
  
     def on_error(self, status):
@@ -51,5 +59,6 @@ class MyListener(StreamListener):
         return True
  
 # get streaming data
+print "Getting {} tweets for: {} ...".format(MAX, hashtag_topic)
 twitter_stream = Stream(auth, MyListener())
 twitter_stream.filter(track=[hashtag_topic], languages=['en'])
