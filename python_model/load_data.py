@@ -36,14 +36,27 @@ class Data:
 	    return data_df
 
 	def csv_df(self, csv_fields):
-		print "Loading csv: " + self.file_name + " ..."
-		data_df = pd.read_csv(self.data_path + self.file_name)
-		data_df =  data_df[csv_fields]
-		data_df.dropna(axis=0, inplace=True) # drop na rows
-		return data_df
+		if len(self.file_name) > 1:
+			print "Loading csv: " 
+			for i in self.file_name.keys():
+				print '\t' + i
+			df_list = []
+			for k in self.file_name:
+				df_k = pd.read_csv(self.data_path + k + '.csv')
+				df_k = df_k[csv_fields]
+				df_k.dropna(axis=0, inplace=True) # drop na rows
+				df_k.loc[:,'class'] = self.file_name[k]
+				df_list.append(df_k)
+			return pd.concat(df_list)
+		else:	
+			print "Loading csv: " + self.file_name + " ..."
+			data_df = pd.read_csv(self.data_path + self.file_name)
+			data_df =  data_df[csv_fields]
+			data_df.dropna(axis=0, inplace=True) # drop na rows
+			return data_df
 
 	# possibly remove bots, but it requires a decision on the score of results, see blow
-	# therefore not used here.
+	# so far not used here.
 	# def remove_bots(self, df):
 	# 	# A username can only contain alphanumeric characters (letters A-Z, numbers 0-9) with the exception of underscores
 	# 	import botornot
@@ -81,11 +94,11 @@ class Data:
 		add_stop_words = ['amp', 'rt']
 		stop_words += add_stop_words
 		# also remove english names
-		last_names = [x.lower() for x in np.loadtxt(self.FILE_PATH+"last_names.txt", usecols=0, dtype=str)[:5000]]
-		stop_words += last_names
-		first_names = [x.lower() for x in np.loadtxt(self.FILE_PATH+"first_names.txt", usecols=0, dtype=str)]
-		stop_words += first_names
-		#     print "sample stopping words: ", stop_words[:5]
+		# last_names = [x.lower() for x in np.loadtxt(self.FILE_PATH+"last_names.txt", usecols=0, dtype=str)[:5000]]
+		# stop_words += last_names
+		# first_names = [x.lower() for x in np.loadtxt(self.FILE_PATH+"first_names.txt", usecols=0, dtype=str)]
+		# stop_words += first_names
+		# print "sample stopping words: ", stop_words[:5]
 		df['tokenized'] = df['tokenized'].apply(lambda x: [item for item in x if item not in stop_words])
 
 	# now let us bring in the wordvec trained using text8 dataset
