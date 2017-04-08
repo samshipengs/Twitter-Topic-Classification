@@ -1,0 +1,6 @@
+data/*
+model/*
+wordvec/*
+
+# exception to the rule
+!.gitkeep
