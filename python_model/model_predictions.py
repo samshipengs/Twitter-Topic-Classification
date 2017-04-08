@@ -66,7 +66,8 @@ def build_cnn(M, D, num_epochs=20):
         dropout2_p=0.5,    
         # output
         output_nonlinearity=lasagne.nonlinearities.softmax,
-        output_num_units=3,
+        output_num_units=5,
+
         # optimization method params
         update=nesterov_momentum,
         update_learning_rate=0.01,
@@ -136,7 +137,7 @@ class Prediction:
 		data = data.reshape(-1, 1, M, D).astype(theano.config.floatX) # theano needs this way
 
 		cnn = build_cnn(M, D)
-		model_file = self.file_path+'nn_cnn'
+		model_file = self.file_path+'model/nn_cnn'
 		cnn.load_params_from(model_file)
 
 		extract_data = extract_features(cnn, data)

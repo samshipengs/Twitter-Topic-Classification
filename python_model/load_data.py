@@ -39,7 +39,7 @@ class Data:
 		if len(self.file_name) > 1:
 			print "Loading csv: " 
 			for i in self.file_name.keys():
-				print '\t' + i
+				print '  ' + i
 			df_list = []
 			for k in self.file_name:
 				df_k = pd.read_csv(self.data_path + k + '.csv')
@@ -47,7 +47,7 @@ class Data:
 				df_k.dropna(axis=0, inplace=True) # drop na rows
 				df_k.loc[:,'class'] = self.file_name[k]
 				df_list.append(df_k)
-			return pd.concat(df_list)
+			return pd.concat(df_list).reset_index(drop=True)
 		else:	
 			print "Loading csv: " + self.file_name + " ..."
 			data_df = pd.read_csv(self.data_path + self.file_name)
@@ -80,11 +80,12 @@ class Data:
 	def pre_process(self, df):
 		print("Note: pre-process changes the dataframe inplace.")
 		# remove new line char
-		df['text'].replace(regex=True,inplace=True,to_replace=r'\\n',value=r'')
+		df['text'].replace(regex=True,inplace=True,to_replace='(\\n|\\r|\\r\\n)',value='')
 		# remove https links
 		df['text'].replace(regex=True,inplace=True,to_replace=r'(http|https):\/\/[^(\s|\b)]+',value=r'')
-		# remove user name
-		df['text'].replace(regex=True,inplace=True,to_replace=r'@\w+',value=r'')
+		# remove user name 
+		# do not remove user name for topic(sports) classification 
+		# df['text'].replace(regex=True,inplace=True,to_replace=r'@\w+',value=r'')
 		# remove non-alphabet, this includes number and punctuation
 		df['text'].replace(regex=True,inplace=True,to_replace=r'[^a-zA-Z\s]',value=r'')
 		# tokenize each tweets to form sentences.
@@ -144,6 +145,8 @@ class Data:
 			tweet_vecs = np.zeros((n,m,self.vec_size))
 			vocabs = model.wv.vocab.keys()
 			for i in range(n):
+				if i%2000 == 0:
+					print ">>>" + str(i) + "tweets converted ..."
 				token_i = [x for x in tweet_tokens[i] if x in vocabs]
 				m_i = len(token_i)
 
