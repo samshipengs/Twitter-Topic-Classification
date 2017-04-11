@@ -4,6 +4,7 @@
 # load libraries
 import pandas as pd
 import numpy as np
+import re
 from gensim.models import word2vec
 import logging
 import nltk
@@ -77,17 +78,21 @@ class Data:
 	# 	results = list(bon.check_accounts_in(accounts))
 
 	# pre-processing text
-	def pre_process(self, df):
+	def pre_process(self, df, rm_list=None):
 		print("Note: pre-process changes the dataframe inplace.")
+		if rm_list:
+			print "Removing ", rm_list
+			for rm in rm_list:
+				df['text'] = df['text'].apply(lambda row: re.sub(rm, ' ', row, flags=re.IGNORECASE))
 		# remove new line char
-		df['text'].replace(regex=True,inplace=True,to_replace='(\\n|\\r|\\r\\n)',value='')
+		df['text'].replace(regex=True,inplace=True,to_replace='(\\n|\\r|\\r\\n)',value=' ')
 		# remove https links
-		df['text'].replace(regex=True,inplace=True,to_replace=r'(http|https):\/\/[^(\s|\b)]+',value=r'')
+		df['text'].replace(regex=True,inplace=True,to_replace='(http|https):\/\/[^(\s|\b)]+',value=' ')
 		# remove user name 
 		# do not remove user name for topic(sports) classification 
 		# df['text'].replace(regex=True,inplace=True,to_replace=r'@\w+',value=r'')
 		# remove non-alphabet, this includes number and punctuation
-		df['text'].replace(regex=True,inplace=True,to_replace=r'[^a-zA-Z\s]',value=r'')
+		df['text'].replace(regex=True,inplace=True,to_replace='[^a-zA-Z\s]',value=' ')
 		# tokenize each tweets to form sentences.
 		df['tokenized'] = df['text'].apply(lambda row: nltk.word_tokenize(row.lower()))
 		# remove stop words
@@ -101,6 +106,7 @@ class Data:
 		# stop_words += first_names
 		# print "sample stopping words: ", stop_words[:5]
 		df['tokenized'] = df['tokenized'].apply(lambda x: [item for item in x if item not in stop_words])
+		df['text'] = df['tokenized'].apply(lambda row: ' '.join(row))
 
 	# now let us bring in the wordvec trained using text8 dataset
 	def build_wordvec(self, size = 200, verbose=True):
@@ -146,7 +152,7 @@ class Data:
 			vocabs = model.wv.vocab.keys()
 			for i in range(n):
 				if i%2000 == 0:
-					print ">>>" + str(i) + "tweets converted ..."
+					print ">>> " + str(i) + " tweets converted ..."
 				token_i = [x for x in tweet_tokens[i] if x in vocabs]
 				m_i = len(token_i)
 

@@ -39,7 +39,7 @@ def build_cnn(M, D, num_epochs=20):
         # input layer
         input_shape=(None, 1, M, D),
         # layer conv2d1
-        conv2d1_num_filters=50,
+        conv2d1_num_filters=32,
         conv2d1_filter_size=(3, 3),
         conv2d1_nonlinearity=lasagne.nonlinearities.rectify,
         conv2d1_W=lasagne.init.GlorotUniform(),  
@@ -49,7 +49,7 @@ def build_cnn(M, D, num_epochs=20):
         # layer maxpool1
         maxpool1_pool_size=(2, 2),    
         # layer conv2d2
-        conv2d2_num_filters=50,
+        conv2d2_num_filters=32,
         conv2d2_filter_size=(3, 3),
         conv2d2_nonlinearity=lasagne.nonlinearities.rectify,
         conv2d2_stride=1,
@@ -70,10 +70,10 @@ def build_cnn(M, D, num_epochs=20):
 
         # optimization method params
         update=nesterov_momentum,
-        update_learning_rate=0.01,
+        update_learning_rate=0.001,
         update_momentum=0.9,
         # train options
-        train_split = TrainSplit(0.2, stratify=True),
+        train_split = TrainSplit(0.25, stratify=True),
         batch_iterator_train = BatchIterator(batch_size=50),
         batch_iterator_test = BatchIterator(batch_size=50),
         max_epochs=num_epochs,
