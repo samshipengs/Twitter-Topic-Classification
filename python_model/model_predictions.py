@@ -40,7 +40,7 @@ def build_cnn(M, D, num_epochs=20):
         input_shape=(None, 1, M, D),
         # layer conv2d1
         conv2d1_num_filters=32,
-        conv2d1_filter_size=(3, 3),
+        conv2d1_filter_size=(5, 5),
         conv2d1_nonlinearity=lasagne.nonlinearities.rectify,
         conv2d1_W=lasagne.init.GlorotUniform(),  
         conv2d1_stride=1,
@@ -50,7 +50,7 @@ def build_cnn(M, D, num_epochs=20):
         maxpool1_pool_size=(2, 2),    
         # layer conv2d2
         conv2d2_num_filters=32,
-        conv2d2_filter_size=(3, 3),
+        conv2d2_filter_size=(5, 5),
         conv2d2_nonlinearity=lasagne.nonlinearities.rectify,
         conv2d2_stride=1,
         conv2d2_pad=1,
@@ -60,7 +60,7 @@ def build_cnn(M, D, num_epochs=20):
         # dropout1
         dropout1_p=0.5,    
         # dense
-        dense_num_units=5000,
+        dense_num_units=1000,
         dense_nonlinearity=lasagne.nonlinearities.rectify,    
         # dropout2
         dropout2_p=0.5,    
@@ -141,7 +141,7 @@ class Prediction:
 		cnn.load_params_from(model_file)
 
 		extract_data = extract_features(cnn, data)
-		clf = joblib.load(self.file_path+'svm-final.pkl')
+		clf = joblib.load(self.file_path+'model/svm-final.pkl')
 		test_pred = clf.predict(extract_data)
 
 		return test_pred + 1

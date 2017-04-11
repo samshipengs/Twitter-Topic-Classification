@@ -137,7 +137,7 @@ class Data:
 
 	# initialize empty arry to fill with vector repsentation
 	def convert2vec(self, df, max_length, model, name='default'):
-		file_name = self.FILE_PATH + name
+		file_name = self.FILE_PATH + 'data/' + name
 		if os.path.isfile(file_name + '.npy'):
 			print "npy already exists, loading ..."
 			tweet_vecs = np.load(file_name + '.npy')
@@ -176,7 +176,7 @@ class Data:
 
 	# save tweet_vecs to disk in npy
 	def save_vec(self, tweet_vecs, name='default'):
-		file_name = self.FILE_PATH + name
+		file_name = self.FILE_PATH + 'data/' + name
 		if os.path.isfile(file_name + '.npy') and os.path.isfile(file_name + '.npz'):
 			print "npy already exists."
 		else:
