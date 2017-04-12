@@ -1,72 +1,31 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.ops import rnn, rnn_cell
+from tensorflow.contrib import rnn
 from sklearn.model_selection import GridSearchCV, train_test_split, ShuffleSplit, KFold
 
-# https://github.com/Lasagne/Lasagne/blob/master/examples/mnist.py
-# https://pythonprogramming.net/rnn-tensorflow-python-machine-learning-tutorial/?completed=/recurrent-neural-network-rnn-lstm-machine-learning-tutorial/
-
-'''
-input > weight > hidden layer 1 (activition function) > weights > hidden l 2
-(activitation function) > weights > output layer
-
-compare output to intended output > cost or loss function (cross entropy)
-optimization function (optimizer) > minimize cost (AdamOptimizer...SGD, AdaGrad)
-
-backprogagation
-
-feed forward + backprop = epoch
-'''
-
 from load_data import Data
-from tensorflow.examples.tutorials.mnist import input_data
+# from tensorflow.examples.tutorials.mnist import input_data
 
-
-
-
-
-
-# mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+# load data and its labels(one-hot encoded)
+# i.e. classes, 1-5
+'''
+1 = [1, 0, 0, 0, 0]
+2 = [0, 1, 0, 0, 0]
+'''
 file_path = '../files/'
-sports_dic = {'basketball':1, 'hockey':2, 'baseball':3, 'tennis':4, 'volleyball':5}
-sp_data = Data(sports_dic, file_path)
-sp_df = sp_data.csv_df(['text']) # load data
-label = sp_df['class']
-# one-hot encode label
-n_classes = 5
-label = np.eye(n_classes, dtype=int)[label.values-1]
-
-file_name = 'sports-600'
-data = np.load(file_path + 'data/' + file_name + '.npy')
-N, M, D = data.shape
-print "N, M, D:", N, M, D
+data_file = file_path + 'data/sports-600.npy'
+label_file = file_path + 'data/labels.npy'
+data = np.load(data_file)
+label = np.load(label_file)
 
 X_train, X_val, y_train, y_val = train_test_split(data, label, test_size=0.2)
 
 print X_train.shape
 print y_train.shape
-print y_train[:5]
 
-
-# 10 classes, 0-9
-'''
-0 = [1, 0, 0, ... , 0]
-1 = [0, 1, 0, ... , 0]
-'''
-# n_nodes_hdl1 = 500
-# n_nodes_hdl2 = 500
-# n_nodes_hdl3 = 500
-
-# hm_epochs = 10
-# # n_classes = 10
-# batch_size = 128
-# chunk_size = 28
-# n_chunks = 28
-# rnn_size = 128
 
 
 hm_epochs = 20
-# n_classes = 10
 batch_size = 50
 chunk_size = D
 n_chunks = M
@@ -97,10 +56,10 @@ def recurrent_neural_network(x):
 
 	x = tf.transpose(x, [1,0,2])
 	x = tf.reshape(x, [-1, chunk_size])		 
-	x = tf.split(0, n_chunks, x)
+	x = tf.split(x, n_chunks, 0)
 
-	lstm_cell = rnn_cell.BasicLSTMCell(rnn_size)
-	outputs, states = rnn.rnn(lstm_cell, x, dtype =tf.float32)
+	lstm_cell = rnn.BasicLSTMCell(rnn_size)
+	outputs, states = rnn.static_rnn(lstm_cell, x, dtype =tf.float32)
 
 	output = tf.matmul(outputs[-1], layer['weights']) + layer['biases']
 
