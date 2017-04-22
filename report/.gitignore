@@ -1,5 +1,5 @@
 *
 !.gitignore
 !*.png
-!.pdf
-!.tex
+!*.pdf
+!*.tex
