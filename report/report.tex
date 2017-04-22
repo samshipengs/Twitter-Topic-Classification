@@ -11,19 +11,19 @@
 
 % Write abstract here
 \begin{abstract}
-Need to write
+???...
 \end{abstract}
 
 % Each section begins with a \section{title} command
 \section{Introduction}
 	% \PARstart{}{} creates a tall first letter for this first paragraph
 	\IEEEPARstart{T}{witter} is an online micro-blogging social media platform where users post messages of at most 140 characters in length. Users have developed a convention whereby the topic to which a tweet relates is encoded in the text of the message as a word beginning with a hash symbol. However, only 14.6\% of tweets contain such a hashtag.
-	
+
 	
 	In this project we attempt to reproduce the modeling approach of Li etal \cite{Li-lstm}, by training a deep neural network on a set of tweets containing hashtags in order to generate a hashtag for tweets that do not contain one. Classifying tweets in this way would potentially enable user interest modeling, recommendation services, and online advertising.
 
 \section{Independent Variables}
-The independent variables in the model are the words and sentences of which a tweet is composed. Approaches such as TF-IDF, kNN, and Naive-Bayes would learn a model using these variables directly. However, there are bottlenecks to such models because they do not make use of the semantic information inherent in words and their composition into sentences. We employ the word2vec technique introduced by Mikolov etal [2] to capture this meaning.
+The independent variables in the model are the words and sentences of which a tweet is composed. Approaches such as TF-IDF, kNN, and Naive-Bayes would learn a model using these variables directly. However, there are bottlenecks to such models because they do not make use of the semantic information inherent in words and their composition into sentences. We employ the word2vec technique introduced by Mikolov et al \cite{word2vec}, 2013 to capture this meaning.
 \section{Literature Review}
 	Much recent work in natural language processing (NLP) involves embedding words as vectors using neural networks ([3] Mikolov et al., 2013) and performs classification on top of that ([4] Collobert et al., 2011). We use the conclusions of such work to inform how we build an in-house classifier for the topic of the tweets we collect.
 \section{Proposed Approach}
@@ -45,20 +45,22 @@ The dataset was collected from Twitter using R ``searchTwitter" function. Five t
 	\caption{Collected Tweets}\label{Tab:1}
 \end{table}
 \subsection{Data Pre-processing}
-Most of the conventional text pre-processing methods are used, two major differences in this project are that all hashtags of the five sports are removed, since they are the labels for each of the tweets which is exactly the label that the model tries to predict and otherwise the model would learn nothing but appear to be performing really well (high accuracy by just looking at the hashtags); The user names are not removed as they could give clues about which sport topic the tweet falls in, e.g. ``@KingJames'' is the username of the basketball star player Lebron James and tweets involving this username are most likely about basketball. So the major pre-processing steps are as follows:
-\begin{itemize}
-\item Replace http links with whitespace.
+Most of the conventional text pre-processing methods are used, two major differences in this project are that all hashtags of the five sports are removed, since they are the labels for each of the tweets which is exactly the label that the model tries to predict and otherwise the model would learn nothing but appear to be performing really well (high accuracy by just looking at the hashtags); The user names are not removed as they could give clues about which sport topic the tweet belongs to, e.g. ``@KingJames'' is the username of the basketball star player Lebron James and tweets involving this username are most likely about basketball. So the major pre-processing steps are as follows:
+\begin{enumerate}
+\item Replace \textit{http} links with whitespace.
 \item Replace hashtags \{\#basketball, \#hockey, \#baseball, \#volleyball, \#tennis\} with whitespace.
 \item Replace newline characters such as \textbackslash r, \textbackslash n and \textbackslash r\textbackslash n with whitespace.
 \item Replace special symbols such as \#, @, \%, \&, \$, digits and punctuations with whitespace.
 \item Remove `RT's (retweets).
 \item Combine multiple whitespaces to one.
 \item Remove duplicated tweets.
-\end{itemize}
-The order of \{2,3\} and \{4\} matters since if \{4\} is executed first then \{2,3\} would not work correctly. \{1,5,7\} is motivated by the same reason as they do not contribute and are noise to the topic classification.
+\end{enumerate}
+
+The order of 2), 3) and 4) matters since if 4) is executed first then 2) and 3) would not work correctly. 1), 5) and 7) are motivated by the same reason as they do not contribute and are noise to the topic classification.
 \section{Experiments with Descriptive Analytics}
 \subsection{Benchmark Experiments}
-To compare the performance of our model to existing techniques, we ran several experiments to arrive at a  benchmark based on these other methods.\\
+To compare the performance of our model to existing techniques, we ran several experiments to arrive at a  benchmark based on these other methods.
+
 In our first pass, we did not remove hashtags for the sports of interest from the tweets in the data pre-processing and cleaning step. We generated a document-term matrix, using the \textit{RTextTools} R library, where each tweet was considered as a document. Frequently occurring terms were chosen as the features to be used for a classifier. To arrive at a reasonable number of features we varied a parameter for removing sparse terms when creating the matrix. With hashtags present, a Naive-Bayes classifier achieved 91\% accuracy as per Table \ref{Tab:2}.
 \begin{table}[!ht]
 	\begin{center}
@@ -75,7 +77,8 @@ In our first pass, we did not remove hashtags for the sports of interest from th
 		\end{tabular}
 	\end{center}
 	\caption{Predicted sports vs actual with hashtags kept and \textit{removeSparseTerms} = 0.9}\label{Tab:2}
-\end{table}\\
+\end{table}
+
 Having realized that the hashtags are essentially the class labels, we understood that their presence in the tweet text causes the classifier to simply recognize the hashtag when training. This results in inflated accuracy and does not reflect the fact that our attempt is to classify tweets that may not include the hashtag word directly. So, in our next pass, we cleaned the tweet text of hashtags, created the document-term matrix to yield more terms, and reapplied the Naive-Bayes classifier. The new accuracy was much lower at only 39\% as per Table \ref{Tab:3}.
 \begin{table}[ht]
 	\begin{center}
@@ -92,7 +95,8 @@ Having realized that the hashtags are essentially the class labels, we understoo
 		\end{tabular}
 	\end{center}
 	\caption{Predicted sports vs actual with hashtags removed and \textit{removeSparseTerms} = 0.985}\label{Tab:3}
-\end{table}\\
+\end{table}
+
 Since the new accuracy was much lower, we sought to verify the assumptions of the Naive-Bayes model. As the order of words in a tweet is important to understanding its content, the independence assumption may not hold. Also the features are so sparse in the columns of the document-term matrix that the assumption of a Gaussian distribution does not hold. Figure \ref{fig:1} shows the distribution of the term “nba” from the previous experiment.
 \begin{figure}[!hbt]
 	\centering
@@ -100,7 +104,8 @@ Since the new accuracy was much lower, we sought to verify the assumptions of th
 	\caption{Non-Gaussian distribution of NBA in document-term matrix}
 	\label{fig:1}
 \end{figure}
-To explore whether we could achieve higher accuracy with other classification techniques, we reduced the data set to 500 tweets per class for a total of 2500, using 70\% for training and 30\% for test. This reduction enabled our experiments to complete in a reasonable amount of time. For Naive-Bayes we noted a revised accuracy of 38\%. Random Forest achieved an accuracy of 27\% as per Table 4 and SVM achieved an accuracy of 24\% as per Table 5.
+
+To explore whether we could achieve higher accuracy with other classification techniques, we reduced the data set to 500 tweets per class for a total of 2500, using 70\% for training and 30\% for test. This reduction enabled our experiments to complete in a reasonable amount of time. For Naive-Bayes we noted a revised accuracy of 38\%. Random Forest achieved an accuracy of 27\% as per Table 4 and SVM achieved an accuracy of 24\% as per Table \ref{Tab:5} .
 \begin{table}[ht]
 	\begin{center}
 		\begin{tabular}{|c|c c c c c|}
@@ -133,18 +138,33 @@ To explore whether we could achieve higher accuracy with other classification te
 	\end{center}
 	\caption{Actual vs predicted sports as classified by SVM with a radial kernel and trained on a reduced dataset}\label{Tab:5}
 \end{table}
+
+The SVM classification accuracy for various kernels is plotted in Figure 2.
+\begin{figure}[!hbt]
+	\centering
+	\includegraphics[width=\columnwidth]{image02.png}
+	\caption{SVM Test Accuracy as achieved by various kernels on the reduced dataset}
+	\label{fig:2}
+\end{figure}
+
+Clearly, our experiments show that after cleaning tweets of the hashtag labels for the sports under consideration, the best test accuracy attainable with conventional methods is 39\%. We now describe our LSTM model and demonstrate its superiority on this task.
+
 \section{Predictive Modeling}
 \subsection{Feature Engineering/extraction}
-Each data point in the raw input data is a tweet that consists a list of words, we convert them to vector representation and use that as the input features to our model. As we have seen previously that using term frequency as the features of each tweet has its limitations since it does not capture semantic information very well. Word2vec techniques, more specifically the Skip-Gram model is used here to convert string of words to vector representation of features Fig \ref{fig:2}.
+Each data point in the raw input data set is a tweet that consists a list of words, we convert them to vector representation and use that as the input features to our model. As we have seen previously that using term frequency as the features of each tweet has its limitations since it does not capture semantic information very well. Word2vec techniques, more specifically the Skip-Gram model is used here to convert string of words to vector representation of features Figure \ref{fig:3}.
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=0.8\columnwidth]{word2vec.png}
 	\caption{ The skip-gram model architecture \cite{Li-lstm}.}
-	\label{fig:2}
-\end{figure}\\
-Skip-gram models utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrendering words from a given words is maximized. In this project, we mapped each unique words into a 600-d low dimensional vector space, i.e. the number of features used in our project are 600. We could convert the data to even higher feature spaces, but that would slow the training and not necessary as the model is already performing very well.
+	\label{fig:3}
+\end{figure}
 
-
+Skip-gram models utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrendering words from a given words is maximized. In this project, we mapped each unique words into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project are 600. We could convert the data to even higher dimesion feature spaces, but that would slow the training and not necessary as the model is already performing very well.
+\subsection{Model Design}
+\subsection{Build Model}
+\subsubsection{Train}
+\subsubsection{Test}
+\subsubsection{Result}
 
 
 
