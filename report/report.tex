@@ -1,5 +1,5 @@
 \documentclass[journal, a4paper]{IEEEtran}
-\usepackage{amsmath,amsthm,amssymb,amsfonts,cite,listings,graphicx,caption,subcaption,hyperref,url,mathtools, multicol, booktabs, scrextend}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,cite,listings,graphicx,caption,subcaption,hyperref,url,mathtools, multicol, booktabs, scrextend, diagbox}
 
 \begin{document}
 
@@ -8,11 +8,6 @@
 	\author{Names}
 	\markboth{DS8004 Data Mining, Ryerson Universtiy}{}
 	\maketitle
-
-% Write abstract here
-\begin{abstract}
-???...
-\end{abstract}
 
 % Each section begins with a \section{title} command
 \section{Introduction}
@@ -66,7 +61,7 @@ In our first pass, we did not remove hashtags for the sports of interest from th
 	\begin{center}
 		\begin{tabular}{|c|c c c c c|}
 			\hline
-			\textit{Predicted}& baseball & basketball & hockey & tennis& volleyball\\
+		\diagbox[width=8em]{actual}{predicted}& baseball & basketball & hockey & tennis& volleyball\\
 			\hline
 			baseball & 2765 & 5 & 1 & 5 &142\\
 			basketball & 4 & 2679&5& 7& 246\\
@@ -84,7 +79,7 @@ Having realized that the hashtags are essentially the class labels, we understoo
 	\begin{center}
 		\begin{tabular}{|c|c c c c c|}
 			\hline
-			\textit{Predicted}& baseball & basketball & hockey & tennis& volleyball\\
+			\diagbox[width=8em]{actual}{predicted}& baseball & basketball & hockey & tennis& volleyball\\
 			\hline
 			baseball &1005&79&42&19&1773\\
 			basketball & 89 & 1494& 179 & 52 & 1127\\
@@ -100,7 +95,7 @@ Having realized that the hashtags are essentially the class labels, we understoo
 Since the new accuracy was much lower, we sought to verify the assumptions of the Naive-Bayes model. As the order of words in a tweet is important to understanding its content, the independence assumption may not hold. Also the features are so sparse in the columns of the document-term matrix that the assumption of a Gaussian distribution does not hold. Figure \ref{fig:1} shows the distribution of the term “nba” from the previous experiment.
 \begin{figure}[!hbt]
 	\centering
-	\includegraphics[width=\columnwidth]{image00.png}
+	\includegraphics[width=\columnwidth]{nba.png}
 	\caption{Non-Gaussian distribution of NBA in document-term matrix}
 	\label{fig:1}
 \end{figure}
@@ -110,13 +105,13 @@ To explore whether we could achieve higher accuracy with other classification te
 	\begin{center}
 		\begin{tabular}{|c|c c c c c|}
 			\hline
-			\textit{d\_pred}& baseball & basketball & hockey & tennis& volleyball\\
+			\diagbox[width=8em]{actual}{predicted}& baseball & basketball & hockey & tennis& volleyball\\
 			\hline
-			baseball &12&2&14&6&7\\
-			basketball &51&52&52&35&54\\
-			hockey &16&12&11&5&22\\
-			tennis &43&27&47&65&20\\
-			volleyball&40&33&46&18&60\\
+			baseball & 12&51&16&43&40\\
+			basketball &2&52&12&27&33\\
+			hockey & 14&52&11&47&46\\
+			tennis &6&35&5&65&18\\
+			volleyball& 7&54&22&20&60\\
 			\hline
 		\end{tabular}
 	\end{center}
@@ -126,13 +121,13 @@ To explore whether we could achieve higher accuracy with other classification te
 	\begin{center}
 		\begin{tabular}{|c|c c c c c|}
 			\hline
-			\textit{d\_pred}& baseball & basketball & hockey & tennis& volleyball\\
+			\diagbox[width=8em]{actual}{predicted}& baseball & basketball & hockey & tennis& volleyball\\
 			\hline
-			baseball &12&5&18&15&11\\
-			basketball &66&56&65&43&60\\
-			hockey &23&13&12&4&21\\
-			tennis &33&24&37&49&18\\
-			volleyball&28&28&38&18&53\\
+			baseball &12&66&23&33&28\\
+			basketball &5&56&13&24&28\\
+			hockey &18&65 &12&37&38\\
+			tennis &15&43&4&49&18\\
+			volleyball&11&60&21&18&53\\
 			\hline
 		\end{tabular}
 	\end{center}
@@ -142,7 +137,7 @@ To explore whether we could achieve higher accuracy with other classification te
 The SVM classification accuracy for various kernels is plotted in Figure 2.
 \begin{figure}[!hbt]
 	\centering
-	\includegraphics[width=\columnwidth]{image02.png}
+	\includegraphics[width=\columnwidth]{compare.png}
 	\caption{SVM Test Accuracy as achieved by various kernels on the reduced dataset}
 	\label{fig:2}
 \end{figure}
@@ -159,7 +154,7 @@ Each data point in the raw input data set is a tweet that consists a list of wor
 	\label{fig:3}
 \end{figure}
 
-Skip-gram models utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrendering words from a given words is maximized. In this project, we mapped each unique words into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project are 600. We could convert the data to even higher dimesion feature spaces, but that would slow the training and not necessary as the model is already performing very well.
+Skip-gram models utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrendering words from a given words is maximized. In this project, we mapped each unique words into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project are 600. We could convert the data to even higher dimension feature spaces, but that would slow the training and not necessary as the model is already performing very well.
 \subsection{Model Design}
 In Li et al [1], they first started with one-hot word representation, pass it through word2vec layers and form distributed word representation. Then a convolutional neural network (CNN) is applied to each sentence in a tweet to extract local semantic information from each sentence, finally the output of CNN is fed to Long Short-Term Memory(LSTM) layer. 
 
@@ -182,63 +177,44 @@ Each of the memory cell contains 4 major operations,
 \subsubsection{Train}
 Combine all sports tweets collected into one data set, with total 44,755 number of tweets. Train the model with a stratified 5-fold cross validation, each with 75\% training set and 25\% validation set. 
 
-The size of hidden neuron is 300, number of memory cell is 23 which is our sentence length(number of words), dimension of each word is 600 as mentioned previously(so the total input data dimension is 23x600). We use batch size 50 and 20 epochs to train our model. 
+The size of hidden neuron is 300, number of memory cell is 23 which is our sentence length(number of words), dimension of each word is 600 as mentioned previously(so the total input data dimension is 23x600). We use batch size 50 and 20 epochs to train our model.\\ 
 \subsubsection{Validation}
-Prediction is made on the 25\% validation set from previous split in total 5 times.
+Prediction is made on the 25\% validation set from previous split in total 5 times.\\
 \subsubsection{Result}
 The evaluation metrics of the result on validation set is \textit{harsh accuracy} that is the mean of the accuracy per class. 
 
-Below is the output of the result from 5-fold cross valiation,
-\begin{verbatim}
-[CV 1]
-Confusion matrix:
-[[2335   35   28   64   27]
-[  53 2356   52   78   42]
-[  24   48 2289   56   16]
-[  44   56   35 2342   32]
-[  23   42   28   72 1012]]
-(Harsh) Accuracy: 0.92
+Table \ref{Tab:6} is the result of first cross validation,
+\begin{table}[ht]
+		\scalebox{0.87}{\begin{tabular}{|c|ccccc|c|}
+			\hline
+			\diagbox[width=8em]{actual}{predicted}& baseball & basketball & hockey & tennis& volleyball&Accuracy\\
+			\hline
+			baseball &2335&35&28&64&27&0.9381\\
+			basketball &53&2356&52&78&42&0.9128\\
+			hockey &24&48&2289&56&16&0.9408\\
+			tennis & 44&56&35&2342&32&0.9334\\
+			volleyball&23&42&28&72&1012&0.8598\\
+			\hline
+		\end{tabular}}
+	\caption{LSTM prediction result of 1st cross validation: confusion matrix and accuracy per class }\label{Tab:6}
+\end{table}
 
-[CV 2]
-Confusion matrix:
-[[2427   52   26   37   36]
-[  47 2378   37   29   34]
-[  66   50 2281   31   18]
-[  83   61   21 2239   78]
-[  40   64   15   30 1009]]
-(Harsh) Accuracy: 0.92
+Finally, we show the complete result of accuracy per class and harsh accuracy for each fold in the cross validation in Figure \ref{fig:5}:
+\begin{figure}[!hbt]
+	\centering
+	\includegraphics[width=\columnwidth]{cv.png}
+	\caption{Each word in sentence connects to a LSTM cell}
+	\label{fig:5}
+\end{figure}
 
-[CV 3]
-Confusion matrix:
-[[2387   46   24   90   20]
-[  43 2278   30   76   47]
-[  40   51 2293   51   18]
-[  26   44   21 2392   34]
-[  39   38   18   72 1011]]
-(Harsh) Accuracy: 0.92
 
-[CV 4]
-Confusion matrix:
-[[2386   58   17   46   15]
-[  64 2311   27   63   21]
-[  63   42 2339   39   14]
-[  68   44   27 2291   33]
-[  76   72   25   92  956]]
-(Harsh) Accuracy: 0.91
-
-[CV 5]
-Confusion matrix:
-[[2239   38   46   78   39]
-[  28 2295   47   55   49]
-[  20   36 2442   43   13]
-[  33   35   33 2383   42]
-[  27   42   18   74 1034]]
-(Harsh) Accuracy: 0.92
-\end{verbatim}
-We see that it achieves remarkble result on this 5-classes sports classification task, it has high harsh accuracy and low variance. 
-
+We see that it achieves remarkable result on this 5-classes sports classification task, it has high harsh accuracy and low variance. Although the model's prediction on \textit{volleyball} is not performing as well as the other topics, this is probably due to relatively small data set of volleyball comparing to the rest collected sports.
 \section{conclusion}
-...
+In this project, we developed a deep learning system to simulate the assignment of a sports topic hashtag to tweets that do not have one. We limited the scope of our work to classifying a tweet as one of five popular sports. The deep learning architecture chosen was an LSTM neural network fed with input consisting of the words of a tweet represented as vectors. The output of the LSTM was then supplied to a softmax layer yielding a sport as a class label. The system achieved a test accuracy of 92\%.
+
+To compare our results to more conventional techniques, we performed a series of benchmark experiments on a data set that was reduced in size. These experiments used the TF-IDF method to obtain a document-term matrix before applying a classifier. Naive-Bayes, Random Forest, and SVM achieved test accuracy scores of 38\%, 27\%, and 24\% respectively. Clearly, LSTM, with word2vec representations as input, greatly outperforms them all.
+
+For future work, the model could possibly be brought more in line with that of Li etal [1] by using a CNN for the sentences of a tweet which feeds an LSTM with its representations. With more computing resources, the number of different sports used as class labels could also be increased.
 
 
 
