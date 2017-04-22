@@ -5,7 +5,7 @@
 
 % Define document title and author
 	\title{Twitter Topic Recommendation with a Deep Learning Model}
-	\author{Names}
+	\author{Anil Trikha, Pengshuai Shi.}
 	\markboth{DS8004 Data Mining, Ryerson Universtiy}{}
 	\maketitle
 
@@ -20,13 +20,13 @@
 \section{Independent Variables}
 The independent variables in the model are the words and sentences of which a tweet is composed. Approaches such as TF-IDF, kNN, and Naive-Bayes would learn a model using these variables directly. However, there are bottlenecks to such models because they do not make use of the semantic information inherent in words and their composition into sentences. We employ the word2vec technique introduced by Mikolov et al \cite{word2vec}, 2013 to capture this meaning.
 \section{Literature Review}
-	Much recent work in natural language processing (NLP) involves embedding words as vectors using neural networks ([3] Mikolov et al., 2013) and performs classification on top of that ([4] Collobert et al., 2011). We use the conclusions of such work to inform how we build an in-house classifier for the topic of the tweets we collect.
+	Much recent work in natural language processing (NLP) involves embedding words as vectors using neural networks (Mikolov et al, 2013 \cite{word2vec}) and performing classification on top of that (Collobert et al., 2011 \cite{classw2v}). We use the conclusions of such work to inform how we build an in-house classifier for the topic of the tweets we collect.
 \section{Proposed Approach}
-We follow the approach of Li etal \cite{Li-lstm}, by first representing each word in the tweet as a numeric vector of multiple dimensions. The vectors are generated from an independent corpus of words using a tool, such as gensim, and then the tweet is converted to sets of these vectors, with one set per sentence. The technique, called word2vec, was originated by Mikolov etal \cite{word2vec} and has the property that similar words appear close to each other in the embedded space and thus capture some of the semantics of the word.
+We follow the approach of Li et al \cite{Li-lstm}, by first representing each word in the tweet as a numeric vector of multiple dimensions. The vectors are generated from an independent corpus of words using a tool, such as \textit{gensim}, and then the tweet is converted to sets of these vectors, with one set per sentence. The technique, called word2vec, was originated by Mikolov etal \cite{word2vec} and has the property that similar words appear close to each other in the embedded space and thus capture some of the semantics of the word.
 A convolutional neural network (CNN) is trained with the word vectors of each sentence of a tweet as the input layer. This yields a set of sentence representations that are fed into an LSTM-RNN to yield a layer representing the tweet which is then fed into a softmax layer whose output is the probability of one of K different hashtags used as class labels.
 \section{Data Preparation}
 \subsection{Data Collection}
-The dataset was collected from Twitter using R ``searchTwitter" function. Five topics are selected:{\em basketball, hockey, baseball, volleyball, tennis} and hashtag is added during collecting, e.g. \textit{\#basketball}. The reason why these sports topics is chosen is because they are major sports so that the number of data collected is sufficiently large for the purpose of the project. For instance, golf is one of the sports that were originally selected, but there were too few data points and thus it is removed from the topics. Football also used to be one of the candidates, due to the ambiguity of football and soccer in different region it is also removed. Only five classes are collected since the more classes the slower training would be. Table \ref{Tab:1} below is the final number of data collected,
+The dataset was collected from Twitter using the R \textit{searchTwitter} function. Five topics were selected: {\em basketball, hockey, baseball, volleyball, tennis} and a hashtag was added during collection, e.g. \textit{\#basketball}. The reason why these sports topics were chosen is because they are major sports so that the number of records collected would be sufficiently large for the purpose of the project. For instance, \textit{golf} was one of the sports was originally selected, but there were too few data points and thus it was removed. \textit{Football} also used to be one of the candidates, but due to the ambiguity of football and soccer in different regions it was also removed. Only five classes were collected since more classes would have slowed training. Table \ref{Tab:1} below shows the final number of tweets collected,
 \begin{table}[ht]
 	\begin{center}
 		\begin{tabular}{|c|c|c|c|c|c|}
@@ -40,7 +40,7 @@ The dataset was collected from Twitter using R ``searchTwitter" function. Five t
 	\caption{Collected Tweets}\label{Tab:1}
 \end{table}
 \subsection{Data Pre-processing}
-Most of the conventional text pre-processing methods are used, two major differences in this project are that all hashtags of the five sports are removed, since they are the labels for each of the tweets which is exactly the label that the model tries to predict and otherwise the model would learn nothing but appear to be performing really well (high accuracy by just looking at the hashtags); The user names are not removed as they could give clues about which sport topic the tweet belongs to, e.g. ``@KingJames'' is the username of the basketball star player Lebron James and tweets involving this username are most likely about basketball. So the major pre-processing steps are as follows:
+Most of the conventional text pre-processing methods are used, with two major differences in this project. Firstly, all hashtags for each of the five sports are removed, since they are the labels for each of the tweets. But this is exactly the label that the model tries to predict so the model would learn nothing but would appear to be performing really well (high accuracy by just looking at the hashtags). Secondly, the user names are not removed as they could provide clues about which sport topic the tweet belongs to, e.g. ``@KingJames'' is the username of the basketball star player Lebron James and tweets involving this username are most likely about basketball. Thus the major pre-processing steps are as follows:
 \begin{enumerate}
 \item Replace \textit{http} links with whitespace.
 \item Replace hashtags \{\#basketball, \#hockey, \#baseball, \#volleyball, \#tennis\} with whitespace.
@@ -51,7 +51,7 @@ Most of the conventional text pre-processing methods are used, two major differe
 \item Remove duplicated tweets.
 \end{enumerate}
 
-The order of 2), 3) and 4) matters since if 4) is executed first then 2) and 3) would not work correctly. 1), 5) and 7) are motivated by the same reason as they do not contribute and are noise to the topic classification.
+The order of 2), 3) and 4) matters since if 4) is executed first then 2) and 3) would not work correctly. 1), 5) and 7) are motivated by the same reason as they do not contribute and are noise to topic classification.
 \section{Experiments with Descriptive Analytics}
 \subsection{Benchmark Experiments}
 To compare the performance of our model to existing techniques, we ran several experiments to arrive at a  benchmark based on these other methods.
@@ -92,7 +92,7 @@ Having realized that the hashtags are essentially the class labels, we understoo
 	\caption{Predicted sports vs actual with hashtags removed and \textit{removeSparseTerms} = 0.985}\label{Tab:3}
 \end{table}
 
-Since the new accuracy was much lower, we sought to verify the assumptions of the Naive-Bayes model. As the order of words in a tweet is important to understanding its content, the independence assumption may not hold. Also the features are so sparse in the columns of the document-term matrix that the assumption of a Gaussian distribution does not hold. Figure \ref{fig:1} shows the distribution of the term “nba” from the previous experiment.
+Since the new accuracy was much lower, we sought to verify the assumptions of the Naive-Bayes model. As the order of words in a tweet is important to understanding its content, the independence assumption may not hold. Also the features are so sparse in the columns of the document-term matrix that the assumption of a Gaussian distribution does not hold. Figure \ref{fig:1} shows the distribution of the term \textit{nba} from the previous experiment.
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=\columnwidth]{nba.png}
@@ -100,7 +100,7 @@ Since the new accuracy was much lower, we sought to verify the assumptions of th
 	\label{fig:1}
 \end{figure}
 
-To explore whether we could achieve higher accuracy with other classification techniques, we reduced the data set to 500 tweets per class for a total of 2500, using 70\% for training and 30\% for test. This reduction enabled our experiments to complete in a reasonable amount of time. For Naive-Bayes we noted a revised accuracy of 38\%. Random Forest achieved an accuracy of 27\% as per Table 4 and SVM achieved an accuracy of 24\% as per Table \ref{Tab:5} .
+To explore whether we could achieve higher accuracy with other classification techniques, we reduced the data set to 500 tweets per class for a total of 2500, using 70\% for training and 30\% for test. This reduction enabled our experiments to complete in a reasonable amount of time. For Naive-Bayes we noted a revised accuracy of 38\%. Random Forest achieved an accuracy of 27\% as per Table \ref{Tab:4} and SVM achieved an accuracy of 24\% as per Table \ref{Tab:5} .
 \begin{table}[ht]
 	\begin{center}
 		\begin{tabular}{|c|c c c c c|}
@@ -146,7 +146,7 @@ Clearly, our experiments show that after cleaning tweets of the hashtag labels f
 
 \section{Predictive Modeling}
 \subsection{Feature Engineering/extraction}
-Each data point in the raw input data set is a tweet that consists a list of words, we convert them to vector representation and use that as the input features to our model. As we have seen previously that using term frequency as the features of each tweet has its limitations since it does not capture semantic information very well. Word2vec techniques, more specifically the Skip-Gram model is used here to convert string of words to vector representation of features Figure \ref{fig:3}.
+Each data point in the raw input data set is a tweet that consists of a list of words, which we convert to vector representation and use as the input features to our model. As we have seen previously, using term frequency as the features of each tweet has its limitations since it does not capture semantic information very well. Word2vec techniques, more specifically the Skip-Gram model is used here to convert a string of words to a vector representation of features Figure \ref{fig:3}.
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=0.8\columnwidth]{word2vec.png}
@@ -154,11 +154,11 @@ Each data point in the raw input data set is a tweet that consists a list of wor
 	\label{fig:3}
 \end{figure}
 
-Skip-gram models utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrendering words from a given words is maximized. In this project, we mapped each unique words into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project are 600. We could convert the data to even higher dimension feature spaces, but that would slow the training and not necessary as the model is already performing very well.
+The skip-gram model utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrounding words from a given word is maximized. In this project, we mapped each unique word into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project is 600. We could convert the data to even higher dimensional feature spaces, but that would slow the training and is not necessary as the model is already performing very well.
 \subsection{Model Design}
-In Li et al [1], they first started with one-hot word representation, pass it through word2vec layers and form distributed word representation. Then a convolutional neural network (CNN) is applied to each sentence in a tweet to extract local semantic information from each sentence, finally the output of CNN is fed to Long Short-Term Memory(LSTM) layer. 
+In Li et al \cite{Li-lstm}, they first start with a one-hot word representation, pass it through word2vec layers and form a distributed word representation. Then a convolutional neural network (CNN) is applied to each sentence in a tweet to extract local semantic information, and finally the output of the CNN is fed to Long Short-Term Memory (LSTM) layer. 
 
-Due to time constraint, in this project our model architecture is different from theirs. We directly use already trained word2vec model on Wikipedia Text8 corpus to encode each word in the input tweets, instead of training the word2vec representation. There is no sentence composition, that is we do not apply CNN on each sentences in a tweet, the memory cell in LSTM layer is directly connected to each vector represented word in our model, and the final output is the predicted topic of that tweet, see Figure \ref{fig:4}:
+Due to time constraints, in this project our model architecture is different from theirs. We directly use an already trained word2vec model on Wikipedia Text8 corpus to encode each word in the input tweets, instead of training the word2vec representation ourselves. There is no sentence composition, that is we do not apply CNN on each sentence in a tweet. Instead, the memory cell in the LSTM layer is directly connected to each vector represented word in our model, and the final output is the predicted topic of that tweet, see Figure \ref{fig:4}. We do not use softmax layer for the classification.
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=\columnwidth]{cell.png}
@@ -166,9 +166,9 @@ Due to time constraint, in this project our model architecture is different from
 	\label{fig:4}
 \end{figure}
 
-Each of the memory cell contains 4 major operations, 
+Each of the memory cells contains 4 major operations: 
 \begin{itemize}
-\item Forget gate: Provide a control over how much information come through from previous cell.
+\item Forget gate: Provide a control over how much information comes through from previous cell.
 \item Input node: Activation from input data at current time step.
 \item Internal gate: Update and provide different candidate.
 \item Ouput gate: Decide what to output and also what gets passed to next memory cell.
@@ -177,13 +177,13 @@ Each of the memory cell contains 4 major operations,
 \subsubsection{Train}
 Combine all sports tweets collected into one data set, with total 44,755 number of tweets. Train the model with a stratified 5-fold cross validation, each with 75\% training set and 25\% validation set. 
 
-The size of hidden neuron is 300, number of memory cell is 23 which is our sentence length(number of words), dimension of each word is 600 as mentioned previously(so the total input data dimension is 23x600). We use batch size 50 and 20 epochs to train our model.\\ 
+The number of hidden neurons is 300, the number of memory cells is 23 which is our sentence length (number of words), the dimension of each word is 600 as mentioned previously (so the total input data dimension is 23x600). We use a batch size of 50 and 20 epochs to train our model.\\ 
 \subsubsection{Validation}
-Prediction is made on the 25\% validation set from previous split in total 5 times.\\
+Predictions are made on the 25\% validation set from previous split, 5 times in total.\\
 \subsubsection{Result}
-The evaluation metrics of the result on validation set is \textit{harsh accuracy} that is the mean of the accuracy per class. 
+The evaluation metric of the result on the validation set is \textit{harsh accuracy} which is the mean of the accuracy per class. 
 
-Table \ref{Tab:6} is the result of first cross validation,
+Table \ref{Tab:6} shows the result of the first cross validation.
 \begin{table}[ht]
 		\scalebox{0.87}{\begin{tabular}{|c|ccccc|c|}
 			\hline
@@ -203,24 +203,18 @@ Finally, we show the complete result of accuracy per class and harsh accuracy fo
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=\columnwidth]{cv.png}
-	\caption{Each word in sentence connects to a LSTM cell}
+	\caption{Accuracy per class and overall harsh accuracy for each validation set}
 	\label{fig:5}
 \end{figure}
 
 
-We see that it achieves remarkable result on this 5-classes sports classification task, it has high harsh accuracy and low variance. Although the model's prediction on \textit{volleyball} is not performing as well as the other topics, this is probably due to relatively small data set of volleyball comparing to the rest collected sports.
+We see that it achieves a remarkable result on this 5-class sports classification task, with high harsh accuracy and low variance. Although the model's prediction on \textit{volleyball} does not perform as well as the other topics, this is probably due to the relatively small size of the volleyball data set compared to the other collected sports.
 \section{conclusion}
-In this project, we developed a deep learning system to simulate the assignment of a sports topic hashtag to tweets that do not have one. We limited the scope of our work to classifying a tweet as one of five popular sports. The deep learning architecture chosen was an LSTM neural network fed with input consisting of the words of a tweet represented as vectors. The output of the LSTM was then supplied to a softmax layer yielding a sport as a class label. The system achieved a test accuracy of 92\%.
+In this project, we developed a deep learning system to simulate the assignment of a sports topic hashtag to tweets that do not have one. We limited the scope of our work to classifying a tweet as one of five popular sports. The deep learning architecture chosen was an LSTM neural network fed with input consisting of the words of a tweet represented as vectors. The output of the LSTM was used directly for the class probability. The system achieved a test accuracy of 92\%.
 
 To compare our results to more conventional techniques, we performed a series of benchmark experiments on a data set that was reduced in size. These experiments used the TF-IDF method to obtain a document-term matrix before applying a classifier. Naive-Bayes, Random Forest, and SVM achieved test accuracy scores of 38\%, 27\%, and 24\% respectively. Clearly, LSTM, with word2vec representations as input, greatly outperforms them all.
 
-For future work, the model could possibly be brought more in line with that of Li etal [1] by using a CNN for the sentences of a tweet which feeds an LSTM with its representations. With more computing resources, the number of different sports used as class labels could also be increased.
-
-
-
-
-
-
+For future work, the model could possibly be brought more in line with that of Li et al \cite{Li-lstm} by using a CNN for the sentences of a tweet which feeds an LSTM with its representations. With more computing resources, the number of different sports used as class labels could also be increased.
 
 \begin{thebibliography}{5}
 
@@ -232,6 +226,8 @@ For future work, the model could possibly be brought more in line with that of L
 	\bibitem{word2vec} % Conference paper
 	T. Mikolov, I. Sutskever, K. Chen, G. Corrado, J. Dean. 2013. Distributed Representations of Words and Phrases and their Compositionality. {\em In Proceedings of NIPS}, 2013.
 
+	\bibitem{classw2v}
+	R. Collobert, J. Weston, L. Bottou, M. Karlen, K.Kavukcuglu, P. Kuksa. 2011. Natural Language Processing (Almost) from Scratch. Journal of Machine Learning Research 12:2493–2537
 \end{thebibliography}
 
 % Your document ends here!
