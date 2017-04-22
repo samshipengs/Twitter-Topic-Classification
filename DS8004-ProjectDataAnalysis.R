@@ -36,7 +36,7 @@ tweets = rbind(train_tweets, test_tweets)
 # build dtm
 matrix= create_matrix(tweets[,1], language="english",
                       removeStopwords=TRUE, removeNumbers=TRUE, 
-                      stemWords=FALSE, removeSparseTerms = 0.90) 
+                      stemWords=FALSE, removeSparseTerms = 0.99) 
 
 # Now, we can train the naive Bayes model with the training set. Note that, e1071 asks the response variable to be numeric or factor. Thus, we convert characters to factors here. This is a little trick.
 
