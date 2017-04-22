@@ -16,13 +16,12 @@
 
 	
 	In this project we attempt to reproduce the modeling approach of Li etal \cite{Li-lstm}, by training a deep neural network on a set of tweets containing hashtags in order to generate a hashtag for tweets that do not contain one. Classifying tweets in this way would potentially enable user interest modeling, recommendation services, and online advertising.
-
 \section{Independent Variables}
 The independent variables in the model are the words and sentences of which a tweet is composed. Approaches such as TF-IDF, kNN, and Naive-Bayes would learn a model using these variables directly. However, there are bottlenecks to such models because they do not make use of the semantic information inherent in words and their composition into sentences. We employ the word2vec technique introduced by Mikolov et al \cite{word2vec}, 2013 to capture this meaning.
 \section{Literature Review}
 	Much recent work in natural language processing (NLP) involves embedding words as vectors using neural networks (Mikolov et al, 2013 \cite{word2vec}) and performing classification on top of that (Collobert et al., 2011 \cite{classw2v}). We use the conclusions of such work to inform how we build an in-house classifier for the topic of the tweets we collect.
 \section{Proposed Approach}
-We follow the approach of Li et al \cite{Li-lstm}, by first representing each word in the tweet as a numeric vector of multiple dimensions. The vectors are generated from an independent corpus of words using a tool, such as \textit{gensim}, and then the tweet is converted to sets of these vectors, with one set per sentence. The technique, called word2vec, was originated by Mikolov etal \cite{word2vec} and has the property that similar words appear close to each other in the embedded space and thus capture some of the semantics of the word.
+We propose to follow the approach of Li et al \cite{Li-lstm}, by first representing each word in the tweet as a numeric vector of multiple dimensions. The vectors are generated from an independent corpus of words using a tool, such as \textit{gensim}, and then the tweet is converted to sets of these vectors, with one set per sentence. The technique, called word2vec, was originated by Mikolov etal \cite{word2vec} and has the property that similar words appear close to each other in the embedded space and thus capture some of the semantics of the word.
 A convolutional neural network (CNN) is trained with the word vectors of each sentence of a tweet as the input layer. This yields a set of sentence representations that are fed into an LSTM-RNN to yield a layer representing the tweet which is then fed into a softmax layer whose output is the probability of one of K different hashtags used as class labels.
 \section{Data Preparation}
 \subsection{Data Collection}
@@ -146,7 +145,7 @@ Clearly, our experiments show that after cleaning tweets of the hashtag labels f
 
 \section{Predictive Modeling}
 \subsection{Feature Engineering/extraction}
-Each data point in the raw input data set is a tweet that consists of a list of words, which we convert to vector representation and use as the input features to our model. As we have seen previously, using term frequency as the features of each tweet has its limitations since it does not capture semantic information very well. Word2vec techniques, more specifically the Skip-Gram model is used here to convert a string of words to a vector representation of features Figure \ref{fig:3}.
+Each data point in the raw input data set is a tweet that consists of a list of words, which we convert to vector representation and use as the input features to our model. As we have seen previously, using term frequency as the features of each tweet has its limitations since it does not capture semantic information very well. Word2vec techniques, more specifically the \textit{Skip-Gram} model are used here to convert a string of words to a vector representation of features. See Figure \ref{fig:3}.
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=0.8\columnwidth]{word2vec.png}
@@ -154,11 +153,11 @@ Each data point in the raw input data set is a tweet that consists of a list of 
 	\label{fig:3}
 \end{figure}
 
-The skip-gram model utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrounding words from a given word is maximized. In this project, we mapped each unique word into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project is 600. We could convert the data to even higher dimensional feature spaces, but that would slow the training and is not necessary as the model is already performing very well.
+The skip-gram model utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrounding words from a given word is maximized. In this project, we mapped each unique word into a 600-d low dimensional (compared to one-hot encoding) vector space, i.e. the number of features used in our project is 600. We could convert the data to even higher dimensional feature spaces, but that would slow the training and is not necessary as the model is already performing very well.
 \subsection{Model Design}
 In Li et al \cite{Li-lstm}, they first start with a one-hot word representation, pass it through word2vec layers and form a distributed word representation. Then a convolutional neural network (CNN) is applied to each sentence in a tweet to extract local semantic information, and finally the output of the CNN is fed to Long Short-Term Memory (LSTM) layer. 
 
-Due to time constraints, in this project our model architecture is different from theirs. We directly use an already trained word2vec model on Wikipedia Text8 corpus to encode each word in the input tweets, instead of training the word2vec representation ourselves. There is no sentence composition, that is we do not apply CNN on each sentence in a tweet. Instead, the memory cell in the LSTM layer is directly connected to each vector represented word in our model, and the final output is the predicted topic of that tweet, see Figure \ref{fig:4}. We do not use softmax layer for the classification.
+Due to time constraints, in this project our model architecture is different from theirs. We directly use an already trained word2vec model on Wikipedia Text8 corpus to encode each word in the input tweets, instead of training the word2vec representation ourselves. There is no sentence composition, that is we do not apply CNN on each sentence in a tweet. Instead, the memory cell in the LSTM layer is directly connected to each vector represented word in our model, and the final output is the predicted topic of that tweet, see Figure \ref{fig:4}. We do not use a softmax layer for the classification.
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics[width=\columnwidth]{cell.png}
@@ -221,13 +220,13 @@ For future work, the model could possibly be brought more in line with that of L
 	%Each item starts with a \bibitem{reference} command and the details thereafter.
 	\bibitem{Li-lstm} % Transaction paper
 	J. Li, H. Xu, X. He, J. Deng and X. Sun. Tweet Modeling with LSTM Recurrent Neural
-	Networks for Hashtag Recommendation {\em International Joint Conference on Neural Networks (IJCNN)}, 2016
+	Networks for Hashtag Recommendation {\em International Joint Conference on Neural Networks (IJCNN)}, 2016\\
 
 	\bibitem{word2vec} % Conference paper
-	T. Mikolov, I. Sutskever, K. Chen, G. Corrado, J. Dean. 2013. Distributed Representations of Words and Phrases and their Compositionality. {\em In Proceedings of NIPS}, 2013.
+	T. Mikolov, I. Sutskever, K. Chen, G. Corrado, J. Dean. 2013. Distributed Representations of Words and Phrases and their Compositionality. {\em In Proceedings of NIPS}, 2013.\\
 
 	\bibitem{classw2v}
-	R. Collobert, J. Weston, L. Bottou, M. Karlen, K.Kavukcuglu, P. Kuksa. 2011. Natural Language Processing (Almost) from Scratch. Journal of Machine Learning Research 12:2493–2537
+	R. Collobert, J. Weston, L. Bottou, M. Karlen, K.Kavukcuglu, P. Kuksa. 2011. Natural Language Processing (Almost) from Scratch. {\em Journal of Machine Learning Research 12:2493–2537}\\
 \end{thebibliography}
 
 % Your document ends here!
