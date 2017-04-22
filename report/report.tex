@@ -161,10 +161,88 @@ Each data point in the raw input data set is a tweet that consists a list of wor
 
 Skip-gram models utilizes a shallow one-layer neural network to learn the representation of words such that the likelihood of obtaining surrendering words from a given words is maximized. In this project, we mapped each unique words into a 600-d low dimensional(comparing to one-hot encoding) vector space, i.e. the number of features used in our project are 600. We could convert the data to even higher dimesion feature spaces, but that would slow the training and not necessary as the model is already performing very well.
 \subsection{Model Design}
+In Li et al [1], they first started with one-hot word representation, pass it through word2vec layers and form distributed word representation. Then a convolutional neural network (CNN) is applied to each sentence in a tweet to extract local semantic information from each sentence, finally the output of CNN is fed to Long Short-Term Memory(LSTM) layer. 
+
+Due to time constraint, in this project our model architecture is different from theirs. We directly use already trained word2vec model on Wikipedia Text8 corpus to encode each word in the input tweets, instead of training the word2vec representation. There is no sentence composition, that is we do not apply CNN on each sentences in a tweet, the memory cell in LSTM layer is directly connected to each vector represented word in our model, and the final output is the predicted topic of that tweet, see Figure \ref{fig:4}:
+\begin{figure}[!hbt]
+	\centering
+	\includegraphics[width=\columnwidth]{cell.png}
+	\caption{Each word in sentence connects to a LSTM cell}
+	\label{fig:4}
+\end{figure}
+
+Each of the memory cell contains 4 major operations, 
+\begin{itemize}
+\item Forget gate: Provide a control over how much information come through from previous cell.
+\item Input node: Activation from input data at current time step.
+\item Internal gate: Update and provide different candidate.
+\item Ouput gate: Decide what to output and also what gets passed to next memory cell.
+\end{itemize} 
 \subsection{Build Model}
 \subsubsection{Train}
-\subsubsection{Test}
+Combine all sports tweets collected into one data set, with total 44,755 number of tweets. Train the model with a stratified 5-fold cross validation, each with 75\% training set and 25\% validation set. 
+
+The size of hidden neuron is 300, number of memory cell is 23 which is our sentence length(number of words), dimension of each word is 600 as mentioned previously(so the total input data dimension is 23x600). We use batch size 50 and 20 epochs to train our model. 
+\subsubsection{Validation}
+Prediction is made on the 25\% validation set from previous split in total 5 times.
 \subsubsection{Result}
+The evaluation metrics of the result on validation set is \textit{harsh accuracy} that is the mean of the accuracy per class. 
+
+Below is the output of the result from 5-fold cross valiation,
+\begin{verbatim}
+[CV 1]
+Confusion matrix:
+[[2335   35   28   64   27]
+[  53 2356   52   78   42]
+[  24   48 2289   56   16]
+[  44   56   35 2342   32]
+[  23   42   28   72 1012]]
+(Harsh) Accuracy: 0.92
+
+[CV 2]
+Confusion matrix:
+[[2427   52   26   37   36]
+[  47 2378   37   29   34]
+[  66   50 2281   31   18]
+[  83   61   21 2239   78]
+[  40   64   15   30 1009]]
+(Harsh) Accuracy: 0.92
+
+[CV 3]
+Confusion matrix:
+[[2387   46   24   90   20]
+[  43 2278   30   76   47]
+[  40   51 2293   51   18]
+[  26   44   21 2392   34]
+[  39   38   18   72 1011]]
+(Harsh) Accuracy: 0.92
+
+[CV 4]
+Confusion matrix:
+[[2386   58   17   46   15]
+[  64 2311   27   63   21]
+[  63   42 2339   39   14]
+[  68   44   27 2291   33]
+[  76   72   25   92  956]]
+(Harsh) Accuracy: 0.91
+
+[CV 5]
+Confusion matrix:
+[[2239   38   46   78   39]
+[  28 2295   47   55   49]
+[  20   36 2442   43   13]
+[  33   35   33 2383   42]
+[  27   42   18   74 1034]]
+(Harsh) Accuracy: 0.92
+\end{verbatim}
+We see that it achieves remarkble result on this 5-classes sports classification task, it has high harsh accuracy and low variance. 
+
+\section{conclusion}
+...
+
+
+
+
 
 
 
